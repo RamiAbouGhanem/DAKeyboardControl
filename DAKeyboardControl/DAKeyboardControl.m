@@ -550,17 +550,25 @@ static char UIViewKeyboardOpened;
     return found;
 }
 
--(UIView*) findInputSetHostView {
-    if([[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0) {
-        for(UIWindow* window in [[UIApplication sharedApplication] windows])
-            if([window isKindOfClass:NSClassFromString(@"UIRemoteKeyboardWindow")])
-                for(UIView* subView in window.subviews)
-                    if([subView isKindOfClass:NSClassFromString(@"UIInputSetHostView")])
-                        for(UIView* subsubView in subView.subviews)
-                            if([subsubView isKindOfClass:NSClassFromString(@"UIInputSetHostView")])
+- (UIView*)findInputSetHostView
+{
+    if([[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0 && !UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+        for(UIWindow* window in [[UIApplication sharedApplication] windows]) {
+            if([window isKindOfClass:NSClassFromString(@"UIRemoteKeyboardWindow")]) {
+                for(UIView* subView in window.subviews) {
+                    if([subView isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
+                        for(UIView* subsubView in subView.subviews) {
+                            if([subsubView isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
                                 return subsubView;
-    } else
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
         return self.keyboardActiveInput.inputAccessoryView.superview;
+    }
     return nil;
 }
 
